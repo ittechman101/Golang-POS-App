@@ -3,6 +3,7 @@ package pos
 import (
 	"errors"
 	"math/rand"
+	"strconv"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/jinzhu/gorm"
@@ -41,13 +42,13 @@ func (repository *CashierRepository) FindCashier(id int) (Cashiers, error) {
 	return cashier, err
 }
 
-func (repository *CashierRepository) Passcode(id int) (int64, error) {
+func (repository *CashierRepository) Passcode(id int) (string, error) {
 	var cashier Cashiers
 	err := repository.database.Where("cashier_id = ?", id).First(&cashier).Error
 	if err != nil {
 		err = errors.New("cashier not found")
 	}
-	return int64(cashier.Passcode), err
+	return cashier.Passcode, err
 }
 
 func (repository *CashierRepository) CreateCashier(cashier Cashiers) (Cashiers, error) {
@@ -60,7 +61,7 @@ func (repository *CashierRepository) CreateCashier(cashier Cashiers) (Cashiers, 
 		`).Scan(
 		&maxCashier,
 	)
-	cashier.Passcode = int64(rand.Intn(899999) + 100000)
+	cashier.Passcode = strconv.Itoa(rand.Intn(899999) + 100000)
 	cashier.CashierId = maxCashier.CashierId
 	err := repository.database.Create(&cashier).Error
 	if err != nil {

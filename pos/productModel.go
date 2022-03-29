@@ -9,7 +9,7 @@ type Products struct {
 	Stock      int64   `json:"stock"`
 	Price      float64 `json:"price"`
 	Image      string  `json:"image"`
-	Category   string  `json:"category"`
+	Sku        string  `json:"SKU"`
 	CategoryId int64   `json:"categoryId"`
-	Discount   string  `json:"discount"`
+	DiscountId int64   `json:"discount"`
 }
