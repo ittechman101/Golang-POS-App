@@ -8,12 +8,12 @@ Functional: Succesfully to get respons with Authorization header
 ✔ Negative case: Failed to get passcode with wrong Cashier ID
 Negative case: Failed to login with wrong passcode
 Negative case: Failed to get respon without Authorization header
-Functional: Succesfully to create cashier
-Functional: Succesfully to update cashier
-Negative case: Failed to create, incomplete cashier data
-Negative case: Failed to update, cashier data does not match
+✔ Functional: Succesfully to create cashier
+✔ Functional: Succesfully to update cashier
+✔ Negative case: Failed to create, incomplete cashier data
+✔ Negative case: Failed to update, cashier data does not match
 ✔ Functional: Successfully to delete cashier
-Negative case: Failed to update, cashier ID does not exist
+✔ Negative case: Failed to update, cashier ID does not exist
 ✔ Negative case: Failed to delete, cashier ID does not exist
 List Produk
 

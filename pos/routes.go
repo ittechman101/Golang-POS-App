@@ -12,10 +12,11 @@ func Register(router fiber.Router, database *gorm.DB) {
 	cashierRepository := NewCashierRepository(database)
 	cashierHandler := NewCashierHandler(cashierRepository)
 
-	router.Get("/cashiers", cashierHandler.GetAll)
-	router.Get("/cashiers/:id", cashierHandler.Get)
+	router.Get("/cashiers", cashierHandler.GetAllCashier)
+	router.Get("/cashiers/:id", cashierHandler.GetCashier)
 	router.Get("/cashiers/:id/passcode", cashierHandler.Passcode)
-	router.Put("/cashiers/:id", cashierHandler.Update)
-	router.Post("/cashiers", cashierHandler.Create)
-	router.Delete("/cashiers/:id", cashierHandler.Delete)
+	router.Post("/cashiers/:id/login", cashierHandler.Login)
+	router.Put("/cashiers/:id", cashierHandler.UpdateCashier)
+	router.Post("/cashiers", cashierHandler.CreateCashier)
+	router.Delete("/cashiers/:id", cashierHandler.DeleteCashier)
 }

@@ -1,6 +1,7 @@
 package pos
 
 import (
+	"encoding/json"
 	"fmt"
 	"strconv"
 
@@ -11,16 +12,17 @@ type CashierHandler struct {
 	repository *CashierRepository
 }
 
-func (handler *CashierHandler) GetAll(c *fiber.Ctx) error {
+func (handler *CashierHandler) GetAllCashier(c *fiber.Ctx) error {
 
-	var cashiers []Cashiers = handler.repository.FindAll(c)
+	var cashiers []Cashiers = handler.repository.FindAllCashier(c)
+	count := handler.repository.GetCashierCount()
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"success": true,
 		"message": "Success",
 		"data": fiber.Map{
 			"cashiers": cashiers,
 			"meta": fiber.Map{
-				"total": len(cashiers),
+				"total": count,
 				"limit": c.Query("limit"),
 				"skip":  c.Query("skip"),
 			},
@@ -28,9 +30,9 @@ func (handler *CashierHandler) GetAll(c *fiber.Ctx) error {
 	})
 }
 
-func (handler *CashierHandler) Get(c *fiber.Ctx) error {
+func (handler *CashierHandler) GetCashier(c *fiber.Ctx) error {
 	id, err := strconv.Atoi(c.Params("id"))
-	cashier, err := handler.repository.Find(id)
+	cashier, err := handler.repository.FindCashier(id)
 
 	if err != nil {
 		return c.Status(404).JSON(fiber.Map{
@@ -66,22 +68,53 @@ func (handler *CashierHandler) Passcode(c *fiber.Ctx) error {
 	})
 }
 
-func (handler *CashierHandler) Create(c *fiber.Ctx) error {
+func (handler *CashierHandler) Login(c *fiber.Ctx) error {
+	id, err := strconv.Atoi(c.Params("id"))
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{"success": false, "message": "param validationError: \"cashierId\" is required"})
+	}
+
+	var p struct {
+		Passcode int64 `json:"passcode"`
+	}
+	err = json.Unmarshal(c.Body(), &p)
+	fmt.Println(p)
+	if err != nil {
+		return c.Status(400).JSON(fiber.Map{"success": false, "message": "body validationError: \"passcode\" is required"})
+	}
+
+	passcode, err := handler.repository.Passcode(id)
+
+	if passcode == p.Passcode {
+		return c.Status(200).JSON(fiber.Map{
+			"success": true,
+			"message": "Success",
+			"data": fiber.Map{
+				"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE2NDYzNjk2NDQsInN1YiI6IjEifQ.OXOV-TjfCbCCJ7z1w1osQ1lz99rK89V_Ert_Y1JUfCM",
+			},
+		})
+	} else {
+		return c.Status(401).JSON(fiber.Map{
+			"success": false,
+			"message": "Passcode Not Match",
+		})
+	}
+}
+
+func (handler *CashierHandler) CreateCashier(c *fiber.Ctx) error {
 	data := new(Cashiers)
 
-	// if err := c.Body("name"); err != nil {
-	// 	return c.Status(500).JSON(fiber.Map{"status": "error", "message": "Review your input", "error": err})
-	// }
+	if len(c.Body()) == 0 {
+		return c.Status(400).JSON(fiber.Map{"success": false, "message": "body ValidationError: \"name\" is required"})
+	}
 
-	fmt.Println("------------ Test ------------")
-
-	payload := struct {
+	var p struct {
 		Name string `json:"name"`
-	}{}
-	c.BodyParser(payload)
-	fmt.Println(payload)
+	}
+	err := json.Unmarshal(c.Body(), &p)
+	data.Name = p.Name
 
-	item, err := handler.repository.Create(*data)
+	item, err := handler.repository.CreateCashier(*data)
 
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
@@ -91,10 +124,14 @@ func (handler *CashierHandler) Create(c *fiber.Ctx) error {
 		})
 	}
 
-	return c.JSON(item)
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{
+		"success": true,
+		"message": "Success",
+		"data":    item,
+	})
 }
 
-func (handler *CashierHandler) Update(c *fiber.Ctx) error {
+func (handler *CashierHandler) UpdateCashier(c *fiber.Ctx) error {
 	id, err := strconv.Atoi(c.Params("id"))
 
 	if err != nil {
@@ -105,34 +142,34 @@ func (handler *CashierHandler) Update(c *fiber.Ctx) error {
 		})
 	}
 
-	cashier, err := handler.repository.Find(id)
+	cashier, err := handler.repository.FindCashier(id)
 
 	if err != nil {
-		return c.Status(400).SendString("Failed to update, cashier ID does not exist")
+		return c.Status(404).JSON(fiber.Map{
+			"success": false,
+			"message": "Cashier Not Found",
+		})
 	}
 
-	cashierData := new(Cashiers)
-
-	if err := c.BodyParser(cashierData); err != nil {
-		return c.Status(400).JSON(fiber.Map{"status": "error", "message": "Review your input", "data": err})
+	var p struct {
+		Name string `json:"name"`
 	}
+	err = json.Unmarshal(c.Body(), &p)
+	cashier.Name = p.Name
 
-	cashier.Name = cashierData.Name
-	cashier.Passcode = cashierData.Passcode
-
-	item, err := handler.repository.Save(cashier)
+	item, err := handler.repository.SaveCashier(cashier)
 
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
-			"message": "Error updating cashier",
-			"error":   err,
+			"success": false,
+			"message": "Cashier Not Found",
 		})
 	}
 
 	return c.JSON(item)
 }
 
-func (handler *CashierHandler) Delete(c *fiber.Ctx) error {
+func (handler *CashierHandler) DeleteCashier(c *fiber.Ctx) error {
 	id, err := strconv.Atoi(c.Params("id"))
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
@@ -141,7 +178,7 @@ func (handler *CashierHandler) Delete(c *fiber.Ctx) error {
 			"err":     err,
 		})
 	}
-	RowsAffected := handler.repository.Delete(id)
+	RowsAffected := handler.repository.DeleteCashier(id)
 	if RowsAffected == 0 {
 		return c.Status(404).JSON(fiber.Map{
 			"success": false,

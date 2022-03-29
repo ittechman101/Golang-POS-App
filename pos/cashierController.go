@@ -2,6 +2,7 @@ package pos
 
 import (
 	"errors"
+	"math/rand"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/jinzhu/gorm"
@@ -11,7 +12,7 @@ type CashierRepository struct {
 	database *gorm.DB
 }
 
-func (repository *CashierRepository) FindAll(c *fiber.Ctx) []Cashiers {
+func (repository *CashierRepository) FindAllCashier(c *fiber.Ctx) []Cashiers {
 	var cashiers []Cashiers
 
 	db := repository.database
@@ -25,7 +26,13 @@ func (repository *CashierRepository) FindAll(c *fiber.Ctx) []Cashiers {
 	return cashiers
 }
 
-func (repository *CashierRepository) Find(id int) (Cashiers, error) {
+func (repository *CashierRepository) GetCashierCount() int64 {
+	var cashiers []Cashiers
+	count := repository.database.Find(&cashiers).RowsAffected
+	return count
+}
+
+func (repository *CashierRepository) FindCashier(id int) (Cashiers, error) {
 	var cashier Cashiers
 	err := repository.database.Where("cashier_id = ?", id).First(&cashier).Error
 	if err != nil {
@@ -34,17 +41,27 @@ func (repository *CashierRepository) Find(id int) (Cashiers, error) {
 	return cashier, err
 }
 
-func (repository *CashierRepository) Passcode(id int) (int, error) {
+func (repository *CashierRepository) Passcode(id int) (int64, error) {
 	var cashier Cashiers
 	err := repository.database.Where("cashier_id = ?", id).First(&cashier).Error
 	if err != nil {
 		err = errors.New("cashier not found")
 	}
-	return int(cashier.Passcode), err
+	return int64(cashier.Passcode), err
 }
 
-func (repository *CashierRepository) Create(cashier Cashiers) (Cashiers, error) {
+func (repository *CashierRepository) CreateCashier(cashier Cashiers) (Cashiers, error) {
+	// Get Max cashierId
+	var maxCashier Cashiers
 
+	repository.database.Raw(`
+		SELECT COALESCE(MAX(cashier_id) + 1, 0) as cashier_id
+		FROM cashiers
+		`).Scan(
+		&maxCashier,
+	)
+	cashier.Passcode = int64(rand.Intn(899999) + 100000)
+	cashier.CashierId = maxCashier.CashierId
 	err := repository.database.Create(&cashier).Error
 	if err != nil {
 		return cashier, err
@@ -53,12 +70,12 @@ func (repository *CashierRepository) Create(cashier Cashiers) (Cashiers, error) 
 	return cashier, nil
 }
 
-func (repository *CashierRepository) Save(cashier Cashiers) (Cashiers, error) {
-	err := repository.database.Table("cashiers").Where("cashier_id = ?", cashier.ID).Update(cashier).Error
+func (repository *CashierRepository) SaveCashier(cashier Cashiers) (Cashiers, error) {
+	err := repository.database.Table("cashiers").Where("cashier_id = ?", cashier.CashierId).Update(cashier).Error
 	return cashier, err
 }
 
-func (repository *CashierRepository) Delete(id int) int64 {
+func (repository *CashierRepository) DeleteCashier(id int) int64 {
 	count := repository.database.Where("cashier_id = ?", id).Delete(&Cashiers{}).RowsAffected
 	return count
 }

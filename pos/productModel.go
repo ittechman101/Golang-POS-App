@@ -2,7 +2,7 @@ package pos
 
 import "github.com/jinzhu/gorm"
 
-type Product struct {
+type Products struct {
 	gorm.Model
 	ProductId  int64   `gorm:"Not Null" json:"productid"`
 	Name       string  `json:"name"`
