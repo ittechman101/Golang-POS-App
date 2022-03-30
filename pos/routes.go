@@ -38,4 +38,10 @@ func Register(router fiber.Router, database *gorm.DB) {
 	router.Get("/products/:id", productHandler.GetProduct)
 	router.Put("/products/:id", productHandler.UpdateProduct)
 	router.Delete("/products/:id", productHandler.DeleteProduct)
+
+	paymentRepository := NewPaymentRepository(database)
+	paymentHandler := NewPaymentHandler(paymentRepository)
+
+	router.Get("/payments", paymentHandler.GetAll)
+	router.Get("/payments/:id", paymentHandler.Get)
 }

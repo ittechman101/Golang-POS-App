@@ -9,6 +9,7 @@ import (
 
 type ProductHandler struct {
 	repository *ProductRepository
+	Base
 }
 
 type CategoryList struct {
@@ -28,6 +29,14 @@ type ProductList struct {
 }
 
 func (handler *ProductHandler) GetAllProduct(c *fiber.Ctx) error {
+
+	// err := handler.Auth(c)
+	// if err != nil {
+	// 	return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+	// 		"success": false,
+	// 		"message": "Authentication Failed",
+	// 	})
+	// }
 
 	var products []ProductList = handler.repository.FindAllProduct(c)
 	count := handler.repository.GetProductCount(c)

@@ -4,10 +4,10 @@ Login
 ✔ Functional: Succesfully get cashier list with limit and skip
 ✔ Functional: Succesfully to get passcode for login
 ✔ Functional: Succesfully to login with correct passcode
-Functional: Succesfully to get respons with Authorization header
+✔ Functional: Succesfully to get respons with Authorization header
 ✔ Negative case: Failed to get passcode with wrong Cashier ID
 ✔ Negative case: Failed to login with wrong passcode
-Negative case: Failed to get respon without Authorization header
+✔ Negative case: Failed to get respon without Authorization header
 ✔ Functional: Succesfully to create cashier
 ✔ Functional: Succesfully to update cashier
 ✔ Negative case: Failed to create, incomplete cashier data

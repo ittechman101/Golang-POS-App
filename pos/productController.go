@@ -18,6 +18,7 @@ func (repository *ProductRepository) FindAllProduct(c *fiber.Ctx) []ProductList 
 
 	db := repository.database.Table("products").Select(
 		"products.product_id, products.sku, products.name, products.stock, products.price, products.image, products.category_id, categories.name as category_name")
+	db = db.Where("products.deleted_at is NULL")
 	if len(c.Query("limit")) > 0 {
 		db = db.Limit(c.Query("limit"))
 	}
@@ -74,26 +75,31 @@ func (repository *ProductRepository) FindProduct(id int) (Products, error) {
 func (repository *ProductRepository) FindProductCategory(id int) (ProductList, error) {
 	var product ProductList
 
+	fmt.Println("---------- Test --------")
+
 	db := repository.database.Table("products").Select(
 		"products.product_id, products.sku, products.name, products.stock, products.price, products.image, products.category_id, categories.name as category_name")
-	db = db.Where("products.product_id = ?", id)
-	rows, _ := db.Joins("left join categories on products.category_id=categories.category_id").Rows()
+	db = db.Where("products.deleted_at is NULL AND products.product_id = ?", id)
+	rows, err := db.Joins("left join categories on products.category_id=categories.category_id").Rows()
+
 	defer rows.Close()
 
-	for rows.Next() {
-		rows.Scan(
-			&product.ProductId,
-			&product.Sku,
-			&product.Name,
-			&product.Stock,
-			&product.Price,
-			&product.Image,
-			&product.Category.CategoryId,
-			&product.Category.Name,
-		)
-		products = append(products, product)
+	if !rows.Next() {
+		return product, errors.New("Product Not Found")
 	}
-	return products
+
+	rows.Scan(
+		&product.ProductId,
+		&product.Sku,
+		&product.Name,
+		&product.Stock,
+		&product.Price,
+		&product.Image,
+		&product.Category.CategoryId,
+		&product.Category.Name,
+	)
+
+	return product, err
 }
 
 func (repository *ProductRepository) CreateProduct(product Products) (Products, error) {

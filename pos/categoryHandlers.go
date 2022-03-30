@@ -9,6 +9,7 @@ import (
 
 type CategoryHandler struct {
 	repository *CategoryRepository
+	Base
 }
 
 func (handler *CategoryHandler) GetAll(c *fiber.Ctx) error {

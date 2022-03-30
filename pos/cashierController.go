@@ -56,7 +56,7 @@ func (repository *CashierRepository) CreateCashier(cashier Cashiers) (Cashiers, 
 	var maxCashier Cashiers
 
 	repository.database.Raw(`
-		SELECT COALESCE(MAX(cashier_id) + 1, 0) as cashier_id
+		SELECT COALESCE(MAX(cashier_id) + 1, 1) as cashier_id
 		FROM cashiers
 		`).Scan(
 		&maxCashier,

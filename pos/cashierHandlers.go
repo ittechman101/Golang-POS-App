@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
+	"github.com/ittechman101/go-pos/config"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -46,6 +47,7 @@ func (handler *CashierHandler) GetCashier(c *fiber.Ctx) error {
 		return c.Status(404).JSON(fiber.Map{
 			"success": false,
 			"message": "Cashier Not Found",
+			"error":   fiber.Map{},
 		})
 	}
 
@@ -95,14 +97,11 @@ func (handler *CashierHandler) Login(c *fiber.Ctx) error {
 
 	if passcode == p.Passcode {
 
-		secretKey := "0e87f7f533a8fcf973735c2ca0584ff7a9b7c2434b1998b4cb4307d9546588e9475c5af4447d58a26607d48278670955cc8a3c825d77c312b5be8a9b096b18ff1bcc33e97fdd8c37f025c19107abfd18d20edd3faa498f7b59d8514707958b16c58195f4a2ff3d0bd02e79d2b1ad8220749062ab59cdecbb4cc96bac3b9cfdfba48db1e563e9ceaeca586bcaceb86fe2b0b702b1c9ae069c3b976b85f191d003fa16396c9bf562c110ab6390eb7e407324d25563575bf241e4d8ce50db07cbdcefccfa5450dd721577b0e055674d25c5336600302968bcfd8220bdfa0c2c5a4b10bf1921fdccb1eaf5279854cadf216d0f9db21f5ee7a60fc4629153cbe349b9"
-		claims := JwtCustomClaims{
-			id,
-			passcode,
-			jwt.StandardClaims{
-				ExpiresAt: time.Now().Add(time.Minute * 30).Unix(),
-				Issuer:    "retroced",
-			},
+		secretKey := config.Config("SECRET_KEY")
+		claims := jwt.MapClaims{
+			"id":     id,
+			"active": true,
+			"exp":    time.Now().Add(time.Hour * 6).Unix(),
 		}
 		token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 		tokenString, err := token.SignedString([]byte(secretKey))
@@ -136,6 +135,23 @@ func (handler *CashierHandler) CreateCashier(c *fiber.Ctx) error {
 		Name string `json:"name"`
 	}
 	err := json.Unmarshal(c.Body(), &p)
+	if err != nil || len(p.Name) == 0 {
+		return c.Status(400).JSON(fiber.Map{
+			"status":  400,
+			"success": false,
+			"message": "body ValidationError: \"name\" is required",
+			"error": fiber.Map{
+				"message": "\"name\" is required",
+				"path":    "name",
+				"type":    "any.required",
+				"context": fiber.Map{
+					"label": "name",
+					"key":   "name",
+				},
+			},
+		})
+	}
+
 	data.Name = p.Name
 
 	item, err := handler.repository.CreateCashier(*data)
@@ -161,8 +177,8 @@ func (handler *CashierHandler) UpdateCashier(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(400).JSON(fiber.Map{
 			"status":  400,
-			"message": "ID not found",
-			"error":   err,
+			"message": "Cashier Not Found",
+			"error":   fiber.Map{},
 		})
 	}
 
@@ -172,6 +188,7 @@ func (handler *CashierHandler) UpdateCashier(c *fiber.Ctx) error {
 		return c.Status(404).JSON(fiber.Map{
 			"success": false,
 			"message": "Cashier Not Found",
+			"error":   fiber.Map{},
 		})
 	}
 
@@ -207,6 +224,7 @@ func (handler *CashierHandler) DeleteCashier(c *fiber.Ctx) error {
 		return c.Status(404).JSON(fiber.Map{
 			"success": false,
 			"message": "Cashier Not Found",
+			"error":   fiber.Map{},
 		})
 	}
 	return c.Status(200).JSON(fiber.Map{
