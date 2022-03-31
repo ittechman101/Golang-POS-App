@@ -5,16 +5,16 @@ services:
   posapp-be-test:
     container_name: posapp-be-test
     image: indraaarmy/posapp-be-test
-    build:
-      context: .
-      target: dev
-    volumes:
-      - .:/app
+    build: .
+      # context: .
+      # target: dev
+    # volumes:
+    #   - .:/app
     ports:
-      - "5000:5000"
-      - "2345:2345"
-    networks:
-      - go-pos-network
+      - "8090:3030"
+#      - "2345:2345"
+    # networks:
+    #   - go-pos-network
 
   # go-pos-db:
   #   container_name: go-pos-db
@@ -48,9 +48,9 @@ services:
 #     ports:
 #       - "3306:3306"
 
-volumes:
-  mysql-db:
+# volumes:
+#   mysql-db:
 
-networks:
-  go-pos-network:
-    name: go-pos-network
+# networks:
+#   go-pos-network:
+#     name: go-pos-network

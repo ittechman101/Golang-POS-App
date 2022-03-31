@@ -5,18 +5,20 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
-	"github.com/ittechman101/go-pos/database"
-	"github.com/ittechman101/go-pos/pos"
+	"github.com/ittechman101/go-pos/models"
+	"github.com/ittechman101/go-pos/routes"
 )
 
 func main() {
 	app := fiber.New()
 	app.Use(cors.New())
-	database.ConnectDB()
+	models.ConnectDB()
 	//	defer database.DB.Close()
 
-	//	api := app.Group("/api")
-	pos.Register(app, database.DB)
+	routes.Register(app, models.DB)
 
-	log.Fatal(app.Listen(":5000"))
+	log.Fatal(app.Listen(":3030"))
 }
+
+//docker build . --target prod -t jetdev7/posapp-be-test
+//docker run -p 3030:3030 -e MYSQL_HOST=10.10.13.183 -e MYSQL_USER=root -e MYSQL_PASSWORD=rkdtjdeornr107 -e MYSQL_DBNAME=go-pos-db jetdev7/posapp-be-test

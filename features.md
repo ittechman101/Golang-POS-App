@@ -45,8 +45,8 @@ Negative case: Failed to get subtotal, empty product
 Input Payment
 
 Functional: Succesfully to get list payment method
-Functional: Cash card validation with grand total 5000
-Functional: Cash card validation with grand total 10000
+✔ Functional: Cash card validation with grand total 5000
+✔ Functional: Cash card validation with grand total 10000
 Functional: Succesfully to create order
 Negative case: Failed to create, empty order data
 Negative case: Failed to create, empty product data
@@ -63,7 +63,7 @@ Functional: Succesfully to get product solds today
 
 Performance
 
-Scalability: Docker image file size optimization should be less than 300MB
+✔ Scalability: Docker image file size optimization should be less than 300MB
 Scalability: Create Product - succesfully to run 1000 request on 1 concurrency
 Scalability: Product Search - succesfully to run 1000 request on 1 concurrency
 Scalability: Product search - succesfully to run 1000 request on 10 concurrency
