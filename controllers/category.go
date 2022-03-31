@@ -9,7 +9,6 @@ import (
 )
 
 type Category struct {
-	//	repository *CategoryRepository
 	Base
 }
 
