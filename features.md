@@ -44,7 +44,7 @@ Negative case: Failed to get subtotal, empty product
 
 Input Payment
 
-Functional: Succesfully to get list payment method
+✔ Functional: Succesfully to get list payment method
 ✔ Functional: Cash card validation with grand total 5000
 ✔ Functional: Cash card validation with grand total 10000
 Functional: Succesfully to create order

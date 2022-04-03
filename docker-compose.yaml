@@ -4,7 +4,7 @@ version: "3.7"
 services:
   posapp-be-test:
     container_name: posapp-be-test
-    image: indraaarmy/posapp-be-test
+    image: jetdev7/posapp-be-test
     build: .
       # context: .
       # target: dev

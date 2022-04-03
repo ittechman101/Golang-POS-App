@@ -85,6 +85,8 @@ func ConnectDB() {
 	DB.AutoMigrate(&Categories{})
 	DB.AutoMigrate(&Products{})
 	DB.AutoMigrate(&Payments{})
+	DB.AutoMigrate(&Order{})
+	DB.AutoMigrate(&OrderProducts{})
 }
 
 func GetDB() *gorm.DB {

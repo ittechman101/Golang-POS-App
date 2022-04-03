@@ -35,4 +35,12 @@ func Register(router fiber.Router, database *gorm.DB) {
 	router.Get("/payments", payment.GetAllPayment)
 	router.Get("/payments/:id", payment.GetPayment)
 
+	order := new(controllers.Order)
+	router.Post("/orders", order.CreateOrder)
+	router.Post("/subtotal", order.GetSubTotal)
+	router.Get("/orders", order.GetAllOrder)
+	router.Get("/orders/:id", order.GetOrder)
+	router.Get("/orders/:id/download", order.GetOrder)
+	router.Get("/orders/:id/check-download", order.GetOrderStatus)
+
 }

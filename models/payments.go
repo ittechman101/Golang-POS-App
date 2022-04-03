@@ -44,7 +44,7 @@ func GetPaymentsCount() int64 {
 func FindPayment(id int) (Payments, error) {
 	var payment Payments
 
-	err := GetDB().Where("category_id = ?", id).First(&payment).Error
+	err := GetDB().Where("payment_id = ?", id).First(&payment).Error
 	if err != nil {
 		err = errors.New("payment not found")
 	}
